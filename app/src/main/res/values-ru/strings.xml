@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Страны мира</string>
+    <string name="all_state">Все страны</string>
+    <string name="saved">Сохранённые</string>
+    <string name="exit">Выход</string>
+    <string name="countries">Страны</string>
+    <string name="map">Карта</string>
+    <string name="go_to_map">Перейти к карте</string>
+
+</resources>
