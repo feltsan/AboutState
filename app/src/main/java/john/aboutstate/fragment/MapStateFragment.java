@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
@@ -34,10 +35,15 @@ public class MapStateFragment extends Fragment {
     private static View rootView;
     private static GoogleMap map;
     double latitude_state,longitude_state,area_state;
-
+    ImageView saveButton,slideButton;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        saveButton  = (ImageView) getActivity().findViewById(R.id.save_state_imgv);
+        slideButton  = (ImageView) getActivity().findViewById(R.id.slide_menu);
+        saveButton.setVisibility(View.INVISIBLE);
+        slideButton.setVisibility(View.INVISIBLE);
 
         Bundle bundle = getArguments();
         latitude_state = Double.parseDouble(bundle.getString("lat"));
@@ -124,6 +130,19 @@ public class MapStateFragment extends Fragment {
                 setUpMap();
         }
     }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        saveButton.setVisibility(View.VISIBLE);
+      //  slideButton.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+    }
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();

@@ -19,6 +19,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.internal.b;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
@@ -26,6 +27,7 @@ import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import john.aboutstate.fragment.AllStateFragment;
 import john.aboutstate.fragment.DetailsStateFragment;
 import john.aboutstate.fragment.MapStateFragment;
+import john.aboutstate.fragment.SavedStateFragment;
 
 
 public class MainActivity extends Activity {
@@ -34,11 +36,11 @@ public class MainActivity extends Activity {
     LayoutInflater inflator;
     ActionBar actionBar;
     View v;
-    LinearLayout linearLayout;
-    LinearLayout linearLayout1;
+    LinearLayout allStateLayout,savedStateLayout ,exitLayout ;
     TextView titleState;
     Fragment fragment1;
     private FragmentMessBroadcastReceiver fragmentMessBroadcastReceiver;
+    ImageView saveIcon;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,14 +54,22 @@ public class MainActivity extends Activity {
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
 
-       if( existingFragment==null ||existingFragment.getClass().equals(AllStateFragment.class) ){
-           v = inflator.inflate(R.layout.all_state_action_bar, null);
+//       if( existingFragment==null ||existingFragment.getClass().equals(AllStateFragment.class) ){
+       //    v = inflator.inflate(R.layout.all_state_action_bar, null);
 
-       }else{
+  //     }else{
            v = inflator.inflate(R.layout.select_state_ab, null);
-       }
+      // }
         actionBar.setCustomView(v);
         actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+
+
+        ImageView backButton = (ImageView) findViewById(R.id.back_button);
+        ImageView saveButton = (ImageView) findViewById(R.id.save_state_imgv);
+        titleState = (TextView) findViewById(R.id.state_title);
+        backButton.setVisibility(View.INVISIBLE);
+        saveButton.setVisibility(View.INVISIBLE);
+        titleState.setText(getResources().getString(R.string.app_name));
 
         slide_menu = new SlidingMenu(this);
         slide_menu.setMode(SlidingMenu.LEFT);
@@ -74,8 +84,10 @@ public class MainActivity extends Activity {
         slide_menu.attachToActivity(this, SlidingMenu.SLIDING_WINDOW);
         slide_menu.setMenu(R.layout.menu);
 
-        linearLayout = (LinearLayout)findViewById(R.id.exit_button);
-        linearLayout1 = (LinearLayout) findViewById(R.id.all_state_item);
+        exitLayout = (LinearLayout)findViewById(R.id.exit_button);
+        allStateLayout = (LinearLayout) findViewById(R.id.all_state_item);
+        savedStateLayout = (LinearLayout) findViewById(R.id.save_state_item);
+        saveIcon =(ImageView)findViewById(R.id.save_state_imgv);
     }
 
     public void toggleMenu(View view){
@@ -97,6 +109,7 @@ public class MainActivity extends Activity {
         IntentFilter filter = new IntentFilter();
         filter.addAction("SendCode");
         filter.addAction("SendLatLng");
+        filter.addAction("SendSaved");
         registerReceiver(fragmentMessBroadcastReceiver, filter);
 
     }
@@ -105,7 +118,9 @@ public class MainActivity extends Activity {
     protected void onResume() {
         super.onResume();
 
-        linearLayout1.setOnClickListener(new View.OnClickListener() {
+
+
+        allStateLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Fragment fragment1 = new AllStateFragment();
@@ -117,7 +132,19 @@ public class MainActivity extends Activity {
             }
         });
 
-        linearLayout.setOnClickListener(new View.OnClickListener() {
+        savedStateLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Fragment fragment3 = new SavedStateFragment();
+                FragmentTransaction ft = getFragmentManager().beginTransaction();
+                ft.replace(R.id.container, fragment3);
+                ft.addToBackStack(null);
+                ft.commitAllowingStateLoss();
+                slide_menu.toggle(true);
+            }
+        });
+
+        exitLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 System.exit(0);
@@ -152,12 +179,29 @@ public class MainActivity extends Activity {
                 ft.addToBackStack(null);
                 fragment2.setArguments(bundle);
                 ft.commitAllowingStateLoss();
-                titleState = (TextView) findViewById(R.id.state_title);
                 titleState.setText(R.string.map_state);
-                ImageView imageView =(ImageView)findViewById(R.id.save_state);
-                imageView.setVisibility(View.INVISIBLE);
+
+                //saveIcon.setVisibility(View.INVISIBLE);
             }
         }
+    }
+
+    public void saveState(View view){
+        FragmentManager fm = getFragmentManager();
+        DetailsStateFragment fragment = (DetailsStateFragment)fm.findFragmentById(R.id.container);
+        fragment.saveState();
+
+        Fragment fragment3 = new SavedStateFragment();
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        ft.replace(R.id.container, fragment3);
+        ft.addToBackStack(null);
+        ft.commitAllowingStateLoss();
+     //   saveIcon.setVisibility(View.INVISIBLE);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
     }
 
     @Override

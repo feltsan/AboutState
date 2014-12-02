@@ -47,6 +47,7 @@ public class AllStateFragment extends Fragment {
     private ListViewAdapter adapter;
     LinearLayout linearLayout;
     Activity mActivity;
+    ImageView backButton, saveButton;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -59,6 +60,11 @@ public class AllStateFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.listview_main,container,false);
+
+        backButton = (ImageView) getActivity().findViewById(R.id.back_button);
+        saveButton = (ImageView) getActivity().findViewById(R.id.save_state_imgv);
+        backButton.setVisibility(View.INVISIBLE);
+        saveButton.setVisibility(View.INVISIBLE);
 
         linearLayout = (LinearLayout) getActivity().findViewById(R.id.all_state_item);
         listView = (ListView) rootView.findViewById(R.id.listview);
@@ -80,12 +86,13 @@ public class AllStateFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        actionBar = getActivity().getActionBar();
-        inflator = (LayoutInflater) getActivity()
-                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        v = inflator.inflate(R.layout.all_state_action_bar, null);
-        actionBar.setCustomView(v);
-        actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+
+//        actionBar = getActivity().getActionBar();
+//        inflator = (LayoutInflater) getActivity()
+//                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+//        v = inflator.inflate(R.layout.all_state_action_bar, null);
+//        actionBar.setCustomView(v);
+//        actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
 
 
 //        linearLayout.setOnClickListener(new View.OnClickListener() {
@@ -96,7 +103,12 @@ public class AllStateFragment extends Fragment {
 //        });
     }
 
-
+    @Override
+    public void onPause() {
+        super.onPause();
+        backButton.setVisibility(View.VISIBLE);
+        saveButton.setVisibility(View.VISIBLE);
+    }
 
     private class DownloadJson extends AsyncTask<Object, Long, JSONObject> {
         @Override
@@ -140,7 +152,7 @@ public class AllStateFragment extends Fragment {
 
         protected void onPostExecute(JSONObject result) {
             super.onPostExecute(result);
-            Log.d("TQR", arrayList.toString() );
+
             adapter = new ListViewAdapter(rootView.getContext(), arrayList);
             listView.setAdapter(adapter);
         }
