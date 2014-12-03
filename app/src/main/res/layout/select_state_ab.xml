@@ -22,6 +22,7 @@
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
         android:onClick="toggleMenu"
+        android:clickable="true"
         android:scaleType="centerInside"
         android:src="@drawable/ic_drawer" />
 
@@ -43,6 +44,7 @@
         android:layout_height="40dp"
         android:layout_toRightOf="@id/back_button"
         android:layout_toLeftOf="@id/save_state_imgv"
+        android:textSize= "16sp"
         android:gravity="center"
         android:textColor="@color/wallet_dim_foreground_inverse_holo_dark"
         />

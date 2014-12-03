@@ -2,13 +2,18 @@ package john.aboutstate;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
+import android.content.res.Configuration;
 import android.graphics.drawable.ColorDrawable;
 import android.media.Image;
 import android.os.Bundle;
@@ -24,6 +29,12 @@ import android.widget.Toast;
 import com.google.android.gms.internal.b;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.TimeZone;
+
 import john.aboutstate.fragment.AllStateFragment;
 import john.aboutstate.fragment.DetailsStateFragment;
 import john.aboutstate.fragment.MapStateFragment;
@@ -38,31 +49,31 @@ public class MainActivity extends Activity {
     View v;
     LinearLayout allStateLayout,savedStateLayout ,exitLayout ;
     TextView titleState;
-    Fragment fragment1;
     private FragmentMessBroadcastReceiver fragmentMessBroadcastReceiver;
     ImageView saveIcon;
+    Calendar c = Calendar.getInstance();
+    public static final String APP_SETTINGS = "app_settings";
+    public static final String APP_CHECK = "app_check";
+    public static final String APP_TIME = "app_time";
+    SharedPreferences sp;
+    private Editor e;
+    private boolean is_check;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         fragmentMessBroadcastReceiver = new FragmentMessBroadcastReceiver();
-        Fragment existingFragment = getFragmentManager().findFragmentById(R.id.container);
 
-        actionBar = getActionBar();
-        inflator = (LayoutInflater) this
-                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        sp = getSharedPreferences(APP_SETTINGS, Context.MODE_PRIVATE);
+        e = sp.edit();
 
+        is_check = sp.getBoolean(MainActivity.APP_CHECK, false);
 
-//       if( existingFragment==null ||existingFragment.getClass().equals(AllStateFragment.class) ){
-       //    v = inflator.inflate(R.layout.all_state_action_bar, null);
-
-  //     }else{
-           v = inflator.inflate(R.layout.select_state_ab, null);
-      // }
-        actionBar.setCustomView(v);
-        actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
-
+        visitor();
+        includeActionBar();
+        includeSlideMenu();
 
         ImageView backButton = (ImageView) findViewById(R.id.back_button);
         ImageView saveButton = (ImageView) findViewById(R.id.save_state_imgv);
@@ -71,18 +82,7 @@ public class MainActivity extends Activity {
         saveButton.setVisibility(View.INVISIBLE);
         titleState.setText(getResources().getString(R.string.app_name));
 
-        slide_menu = new SlidingMenu(this);
-        slide_menu.setMode(SlidingMenu.LEFT);
-        slide_menu.setTouchModeAbove(SlidingMenu.TOUCHMODE_MARGIN);
-        slide_menu.setShadowWidthRes(R.dimen.shadow_width);
-        slide_menu.setShadowDrawable(R.drawable.shadow);
-        slide_menu.setShadowWidth(15);
-        slide_menu.setBehindWidth(200);
-        slide_menu.setBehindWidthRes(R.dimen.slidingmenu_offset);
-//        slide_menu.setBehindOffsetRes(R.dimen.slidingmenu_offset);
-        slide_menu.setFadeDegree(0.35f);
-        slide_menu.attachToActivity(this, SlidingMenu.SLIDING_WINDOW);
-        slide_menu.setMenu(R.layout.menu);
+
 
         exitLayout = (LinearLayout)findViewById(R.id.exit_button);
         allStateLayout = (LinearLayout) findViewById(R.id.all_state_item);
@@ -98,7 +98,7 @@ public class MainActivity extends Activity {
 
     public void backButton(View view){
         super.onBackPressed();
-
+        Fragment existingFragment = getFragmentManager().findFragmentById(R.id.container);
     }
 
 
@@ -117,8 +117,6 @@ public class MainActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-
-
 
         allStateLayout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -181,7 +179,6 @@ public class MainActivity extends Activity {
                 ft.commitAllowingStateLoss();
                 titleState.setText(R.string.map_state);
 
-                //saveIcon.setVisibility(View.INVISIBLE);
             }
         }
     }
@@ -199,6 +196,7 @@ public class MainActivity extends Activity {
      //   saveIcon.setVisibility(View.INVISIBLE);
     }
 
+
     @Override
     protected void onPause() {
         super.onPause();
@@ -207,7 +205,78 @@ public class MainActivity extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        Date date =new Date();
+        DateFormat formater = new SimpleDateFormat("dd-MM-yyyy HH:mm");
+        formater.setTimeZone(TimeZone.getTimeZone("EET"));
 
+        e.putString(APP_TIME,formater.format(date).toString());
+        e.apply();
         unregisterReceiver(fragmentMessBroadcastReceiver);
     }
+
+    public void first() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder.setTitle("Welcome!")
+                .setMessage("Undestande the world with us!")
+                .setIcon(R.drawable.earth)
+                .setCancelable(false)
+                .setNegativeButton("GO!",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel();
+                            }
+                        });
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+    public void lastVisit() {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder.setTitle("Last visit:" )
+                .setMessage("")
+                .setCancelable(false)
+                .setNegativeButton("GO",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel();
+                            }
+                        });
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+    private void includeSlideMenu(){
+        slide_menu = new SlidingMenu(this);
+        slide_menu.setMode(SlidingMenu.LEFT);
+        slide_menu.setTouchModeAbove(SlidingMenu.TOUCHMODE_MARGIN);
+        slide_menu.setShadowWidthRes(R.dimen.shadow_width);
+        slide_menu.setShadowDrawable(R.drawable.shadow);
+        slide_menu.setShadowWidth(15);
+        slide_menu.setBehindWidth(200);
+        slide_menu.setBehindOffsetRes(R.dimen.slidingmenu_offset);
+//        slide_menu.setBehindOffsetRes(R.dimen.slidingmenu_offset);
+        slide_menu.setFadeDegree(0.35f);
+        slide_menu.attachToActivity(this, SlidingMenu.SLIDING_WINDOW);
+        slide_menu.setMenu(R.layout.menu);
+    }
+    private void includeActionBar(){
+        actionBar = getActionBar();
+        inflator = (LayoutInflater) this
+                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        v = inflator.inflate (R.layout.select_state_ab, null);
+
+        actionBar.setCustomView(v);
+        actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+    }
+    private void visitor(){
+        if(is_check){
+            lastVisit();
+        }else{
+            first();
+            e.putBoolean(APP_CHECK,true);
+            e.apply();
+        }
+    }
+
 }

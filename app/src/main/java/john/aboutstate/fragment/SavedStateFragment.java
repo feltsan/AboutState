@@ -15,6 +15,7 @@ import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,6 +38,7 @@ public class SavedStateFragment extends Fragment {
     private ListViewAdapter adapter;
     Cursor c;
     ImageView backButton, saveButton;
+    TextView titleApp;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -51,8 +53,11 @@ public class SavedStateFragment extends Fragment {
         listView = (ListView) rootView.findViewById(R.id.listview);
         backButton = (ImageView) getActivity().findViewById(R.id.back_button);
         saveButton = (ImageView) getActivity().findViewById(R.id.save_state_imgv);
+        titleApp = (TextView)getActivity().findViewById(R.id.state_title);
+
         backButton.setVisibility(View.INVISIBLE);
         saveButton.setVisibility(View.INVISIBLE);
+        titleApp.setText(R.string.app_name);
 
         dbHelper = new DatabaseHelper(getActivity());
         db = dbHelper.getWritableDatabase();

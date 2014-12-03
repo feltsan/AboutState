@@ -7,6 +7,7 @@ import android.app.FragmentTransaction;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
@@ -304,6 +305,20 @@ public class DetailsStateFragment extends Fragment {
             e.printStackTrace();
         }
     }
+
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+
+//        if(newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE||newConfig.orientation == Configuration.ORIENTATION_PORTRAIT){
+//            Fragment fragment = new DetailsStateFragment();
+//            fragment.setArguments(bundle);
+//            FragmentTransaction ft = getFragmentManager().beginTransaction();
+//            ft.addToBackStack(null);
+//            ft.replace(R.id.container, fragment);
+//                        ft.commitAllowingStateLoss();
+//        }
+
+    }
 }
-
-

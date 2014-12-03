@@ -7,6 +7,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <uses-feature
         android:glEsVersion="0x00020000"
@@ -15,11 +16,13 @@
     <application
         android:allowBackup="true"
         android:label=""
-        android:theme="@style/Sherlock.__Theme.Light" >
+        android:theme="@style/Sherlock.__Theme.Light"
+>
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
-
+            android:screenOrientation="sensor"
+            android:configChanges="keyboardHidden|orientation|screenSize"
             >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -35,6 +38,17 @@
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="AIzaSyA26Y3OZ-drVgOPWu4l6Cw_IetRH6SMGPg" />
 
+        <receiver
+            android:name=".support.BootReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <service
+            android:name=".support.ServiceApp"
+            android:exported="false"/>
 
     </application>
 
