@@ -51,7 +51,7 @@ public class MainActivity extends Activity {
     TextView titleState;
     private FragmentMessBroadcastReceiver fragmentMessBroadcastReceiver;
     ImageView saveIcon;
-    Calendar c = Calendar.getInstance();
+
     public static final String APP_SETTINGS = "app_settings";
     public static final String APP_CHECK = "app_check";
     public static final String APP_TIME = "app_time";
@@ -68,7 +68,6 @@ public class MainActivity extends Activity {
 
         sp = getSharedPreferences(APP_SETTINGS, Context.MODE_PRIVATE);
         e = sp.edit();
-
         is_check = sp.getBoolean(MainActivity.APP_CHECK, false);
 
         visitor();
@@ -205,16 +204,26 @@ public class MainActivity extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
+        unregisterReceiver(fragmentMessBroadcastReceiver);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
         Date date =new Date();
         DateFormat formater = new SimpleDateFormat("dd-MM-yyyy HH:mm");
         formater.setTimeZone(TimeZone.getTimeZone("EET"));
 
-        e.putString(APP_TIME,formater.format(date).toString());
+        System.out.println(formater.format(date));
+
+        Log.d("SQWER", formater.format(date));
+
+        e.putString(APP_TIME, formater.format(date));
         e.apply();
-        unregisterReceiver(fragmentMessBroadcastReceiver);
     }
 
-    public void first() {
+    private void first() {
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
         builder.setTitle("Welcome!")
                 .setMessage("Undestande the world with us!")
@@ -230,11 +239,11 @@ public class MainActivity extends Activity {
         alert.show();
     }
 
-    public void lastVisit() {
+    private void lastVisit() {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-        builder.setTitle("Last visit:" )
-                .setMessage("")
+        builder.setTitle("Last visit:")
+                .setMessage(sp.getString(MainActivity.APP_TIME, ""))
                 .setCancelable(false)
                 .setNegativeButton("GO",
                         new DialogInterface.OnClickListener() {
